@@ -28,7 +28,7 @@ void rfTx(int data){
   }
   digitalWrite(pin_data, HIGH);
   Serial.println();
-  delay(50);
+  delay(100);
 }
 
 void setup(){
@@ -40,6 +40,7 @@ void setup(){
   Serial.begin(9600);
 
   //Start up into full green
+  delay(500); //Boards seem to be unresponsive immediately after start
   rfTx(0x80); //Clear whatever's going on if hotplugged
   rfTx(0x84); //Init LED controller
   rfTx(0xAF); //All green
