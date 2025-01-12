@@ -6,15 +6,6 @@
 #define pin_data 6 //D1, ARGON_DATA
 #define pin_clk 5 //D0, ARGON_CLK
 
-void setup(){
-  pinMode(pin_sw, INPUT_PULLUP);
-  pinMode(pin_data, OUTPUT);
-  digitalWrite(pin_data, HIGH);
-  pinMode(pin_clk, INPUT_PULLUP);
-
-  Serial.begin(9600);
-}
-
 void rfTx(int data){
   Serial.print("Sending: ");
   Serial.print(data, HEX);
@@ -40,8 +31,22 @@ void rfTx(int data){
   delay(50);
 }
 
+void setup(){
+  pinMode(pin_sw, INPUT_PULLUP);
+  pinMode(pin_data, OUTPUT);
+  digitalWrite(pin_data, HIGH);
+  pinMode(pin_clk, INPUT_PULLUP);
+
+  Serial.begin(9600);
+
+  //Start up into full green
+  rfTx(0x80); //Clear whatever's going on if hotplugged
+  rfTx(0x84); //Init LED controller
+  rfTx(0xAF); //All green
+}
+
 void loop(){
-  static int stage = 0;
+  static int stage = 1;
 
   //Requires release before registering another press
   static bool pressed = 0;
@@ -82,5 +87,10 @@ void loop(){
     //Toggle through modes
     stage++;
     stage %= 3;
+  }
+
+  //Manually control board if you send bytes over serial
+  if(Serial.available() > 0){
+    rfTx(Serial.read());
   }
 }
